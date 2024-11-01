@@ -96,7 +96,7 @@ public abstract class Mejora implements Colisionable {
         int tipoAleatorio = random.nextInt(2);
         switch (tipoAleatorio) {
             case 0: return new PlanetaMejora(x, y, new Texture("planeta.png"), 7);
-            case 1: return new EstrellaMejora(x, y, new Texture("estrella.png"), 7);
+            case 1: return new EstrellaMejora(x, y, new Texture("estrella.png"), 100);
 
         }
         return null;

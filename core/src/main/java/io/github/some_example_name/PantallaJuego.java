@@ -101,7 +101,7 @@ public class PantallaJuego implements Screen {
                 new Texture(Gdx.files.internal("MainShip3.png")),
                 Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")),
                 new Texture(Gdx.files.internal("Rocket2.png")),
-                Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")));
+                Gdx.audio.newSound(Gdx.files.internal("disparo.wav")));
 		nave.setVidas(vidas);
 
         fondo = new Fondo("FondoEspacio.jpg", 1920, 1080, 50);
@@ -201,7 +201,7 @@ public class PantallaJuego implements Screen {
             b.update();
             for (int j = 0; j < balls1.size(); j++) {
                 if (b.checkCollision(balls1.get(j))) {
-                    explosionSound.play();
+                    explosionSound.play(0.5f);
                     balls1.remove(j);
                     j--;
                     score += 10;
@@ -257,7 +257,7 @@ public class PantallaJuego implements Screen {
 
                 // Si la bala colisiona con la mejora
                 if (b.checkCollision(mejora)) {
-                    explosionSound.play();
+                    explosionSound.play(0.4f);
 
                     if (mejora instanceof PlanetaMejora) {
                         PlanetaMejora planeta = (PlanetaMejora) mejora;
@@ -278,7 +278,7 @@ public class PantallaJuego implements Screen {
                             estrella.activar(nave); // Aplica el efecto de mejora de la estrella
                             mejorasActivas.add(mejora);
                             mejoras.remove(j);
-                            score += 150; // Aumenta el puntaje por destruir la estrella
+                            score += 100; // Aumenta el puntaje por destruir la estrella
                             j--;
                         }
                     }
@@ -324,7 +324,7 @@ public class PantallaJuego implements Screen {
         	if (score > game.getHighScore())
 				game.setHighScore(score);
             gameMusic.stop();
-            game.setScreen(new PantallaGameOver(game));
+            game.setScreen(new PantallaGameOver(game,score));
         }
     }
 
@@ -334,7 +334,7 @@ public class PantallaJuego implements Screen {
             ronda++;
             contadorMejoras = 0;
             game.setScreen(new PantallaJuego(game, ronda,  nave.getVidas() ,score, velXAsteroides + INCREMENTO_VELOCIDAD,
-                    velYAsteroides + INCREMENTO_VELOCIDAD, cantAsteroides + 4, contadorRondas + 1));
+                    velYAsteroides + INCREMENTO_VELOCIDAD, cantAsteroides + 3, contadorRondas + 1));
         }
     }
 

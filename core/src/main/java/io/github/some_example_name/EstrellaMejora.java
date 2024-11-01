@@ -24,7 +24,7 @@ public class EstrellaMejora extends Mejora  {
  // Verifica si la mejora ha sido destruida
     public boolean estaDestruido() {
     	Random random = new Random();
-        maxImpactos = random.nextInt(20);
+        maxImpactos = random.nextInt(100);
         return contadorImpactos >= maxImpactos;
     }
 

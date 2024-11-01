@@ -27,7 +27,7 @@ public class PlanetaMejora extends Mejora {
  // Verifica si la mejora ha sido destruida
     public boolean estaDestruido() {
     	Random random = new Random();
-        maxImpactos = random.nextInt(20);
+        maxImpactos = random.nextInt(10);
         return contadorImpactos >= maxImpactos;
     }
 
