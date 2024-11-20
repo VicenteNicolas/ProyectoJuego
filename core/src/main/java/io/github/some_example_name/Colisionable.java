@@ -6,4 +6,5 @@ public interface Colisionable {
 	
 	void procesarColision(Nave4 nave); // Método para procesar colisiones
 	
+	
 }

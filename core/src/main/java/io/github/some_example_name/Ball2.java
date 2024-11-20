@@ -132,8 +132,7 @@ public class Ball2 implements Colisionable {
 
 	@Override
 	public void procesarColision(Nave4 nave) {
-		nave.herir();
-		
+		nave.herir();	
 	}
 }
 

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class Mejora implements Colisionable {
     private String tipo;
-    private float duracion;
+    protected float duracion;
     private boolean activa;
     private float tiempoActivacion;
     protected float x, y;
@@ -65,10 +65,9 @@ public abstract class Mejora implements Colisionable {
             case "escudo":
 
                 break;
-            case "disparo y vida":
-            	
+            case "disparo y vida":    	
             	nave.reducirCooldownDisparo();
-            	nave.setVidas(5);;
+            	GameState.nuevasVidas(5);
 
                 break;
         }
@@ -95,7 +94,7 @@ public abstract class Mejora implements Colisionable {
         Random random = new Random();
         int tipoAleatorio = random.nextInt(2);
         switch (tipoAleatorio) {
-            case 0: return new PlanetaMejora(x, y, new Texture("planeta.png"), 7);
+            case 0: return new PlanetaMejora(x, y, new Texture("planeta.png"), 10);
             case 1: return new EstrellaMejora(x, y, new Texture("estrella.png"), 100);
 
         }

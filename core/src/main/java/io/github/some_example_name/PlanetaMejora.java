@@ -54,7 +54,7 @@ public class PlanetaMejora extends Mejora {
 
 	@Override
 	public void procesarColision(Nave4 nave) {
-		nave.setVidas(0);
+		GameState.nuevasVidas(0);
 		
 	}
 

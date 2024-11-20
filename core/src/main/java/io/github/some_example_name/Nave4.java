@@ -1,29 +1,22 @@
 package io.github.some_example_name;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Nave4 {
     private boolean destruida = false;
-    private int vidas = 3;
     private Sprite spr;
     private Sound sonidoHerido;
-    
-    private float xVel = 0;
-    private float yVel = 0;
-    private float velocidadActual = 1;
-
 
     private boolean herido = false;
     private int tiempoHeridoMax = 50;
     private int tiempoHerido;
     private Disparo disparo;
+
+    private MovimientoNave movimientoNave;
 
     public Nave4(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
         this.sonidoHerido = soundChoque;
@@ -32,60 +25,24 @@ public class Nave4 {
         spr.setBounds(x, y, 60, 60);
         this.disparo = new Disparo(spr, soundBala, txBala);
 
+        this.movimientoNave = new MovimientoNave(spr, 1); // Velocidad inicial
     }
-    
+
     public void reducirCooldownDisparo() {
         disparo.setCooldown(0.1f);
     }
-    
+
     public Disparo getDisparo() {
         return disparo;
     }
 
     public void draw(SpriteBatch batch, PantallaJuego juego) {
-    	
-    	float x = spr.getX();
-        float y = spr.getY();
-
-      
         if (!herido) {
-        	// Movimiento con teclado
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-                xVel = -2;
-            else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-                xVel = 2;
-            else
-                xVel = 0; // Detener movimiento horizontal
-
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-                yVel = -2;
-            else if (Gdx.input.isKeyPressed(Input.Keys.UP))
-                yVel = 2;
-            else
-                yVel = 0; // Detener movimiento vertical
-
-            // Mantener dentro de los bordes de la ventana
-            if (x + xVel * velocidadActual < 0) {
-                spr.setX(0);
-            } else if (x + xVel * velocidadActual + spr.getWidth() > Gdx.graphics.getWidth()) {
-                spr.setX(Gdx.graphics.getWidth() - spr.getWidth());
-            } else {
-                spr.setX(x + xVel * velocidadActual);
-            }
-
-            if (y + yVel * velocidadActual < 0) {
-                spr.setY(0);
-            } else if (y + yVel * velocidadActual + spr.getHeight() > Gdx.graphics.getHeight()) {
-                spr.setY(Gdx.graphics.getHeight() - spr.getHeight());
-            } else {
-                spr.setY(y + yVel * velocidadActual);
-            }
-
+            movimientoNave.actualizar();
             spr.draw(batch);
         } else {
-            spr.setX(spr.getX() + MathUtils.random(-2, 2));
+            movimientoNave.aplicarMovimientoHerido();
             spr.draw(batch);
-            spr.setX(spr.getX());
             tiempoHerido--;
             if (tiempoHerido <= 0)
                 herido = false;
@@ -100,18 +57,17 @@ public class Nave4 {
     }
 
     public boolean checkCollision(Colisionable c) {
-        if (c.getArea().overlaps(getBounds())) {
-            return true;
-        }
-        return false;
+        return c.getArea().overlaps(getBounds());
     }
 
     public void herir() {
-        vidas--;
+        GameState gameState = GameState.getInstance(); // Obtener instancia única de GameState
+
+        gameState.reducirVida();
         herido = true;
         tiempoHerido = tiempoHeridoMax;
         sonidoHerido.play();
-        if (vidas <= 0) {
+        if (gameState.getVidas() <= 0) {
             destruida = true;
         }
     }
@@ -124,23 +80,16 @@ public class Nave4 {
         return herido;
     }
 
-    public int getVidas() {
-        return vidas;
-    }
 
-    public void setVidas(int vidas2) {
-        vidas = vidas2;
-    }
-    
     public void incrementarVelocidad() {
-        velocidadActual += 2; // Incremento de velocidad
+        movimientoNave.incrementarVelocidad(2);
     }
 
     public void revertirVelocidad() {
-        velocidadActual = 1; // Vuelve a la velocidad base
+        movimientoNave.revertirVelocidad(1);
     }
 
     public float getVelocidad() {
-        return velocidadActual;
+        return movimientoNave.getVelocidad();
     }
 }

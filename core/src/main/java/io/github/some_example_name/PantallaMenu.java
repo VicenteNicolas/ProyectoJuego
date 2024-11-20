@@ -65,7 +65,7 @@ public class PantallaMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // Cambia a la pantalla de juego al hacer clic
-                game.setScreen(new PantallaJuego(game, 1, 3, 0, 1, 1, 5, 1));
+                game.setScreen(new PantallaJuego(game, 1, 3, 1, 1, 5, 1));
                 dispose(); // Libera los recursos de la pantalla del menú
             }
         });

@@ -18,170 +18,144 @@ public class PantallaGameOver implements Screen {
 
     private SpaceNav game;
     private OrthographicCamera camera;
-    private BitmapFont font; // Objeto de fuente
-    private float initialWidth; // Ancho inicial de la ventana
-    private Stage stage; // Nuevo escenario
-    private TextButton playButton; // Botón para reiniciar el juego
-    private TextButton exitButton; // Botón para salir del juego
-    private TextButton menuButton; // Botón para volver al menú
-    private Texture backgroundTexture; // Nueva variable para la textura de fondo
+    private BitmapFont font;
+    private float initialWidth;
+    private Stage stage;
+    private TextButton playButton;
+    private TextButton exitButton;
+    private TextButton menuButton;
+    private Texture backgroundTexture;
+    private GameState dev;
 
-    private int score; // Atributo para almacenar la puntuación
-
-    public PantallaGameOver(SpaceNav game, int score) {
+    public PantallaGameOver(SpaceNav game) {
         this.game = game;
-        this.score = score; // Guardar la puntuación
+        dev = GameState.getInstance();
+        init();
+    }
 
+    private void init() {
+        // Inicializar cámara y vista
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        new GlyphLayout();
-        font = game.getFont(); // Asumiendo que este método devuelve un BitmapFont
-        initialWidth = Gdx.graphics.getWidth(); // Guardar el ancho inicial
+        font = game.getFont();
+        initialWidth = Gdx.graphics.getWidth();
 
-        // Inicializa el Stage
+        // Inicializar el Stage
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-        Gdx.input.setInputProcessor(stage); // Procesador de entrada
+        Gdx.input.setInputProcessor(stage);
 
-        // Carga la imagen de fondo
-        backgroundTexture = new Texture(Gdx.files.internal("fondoGameOver - copia.png")); // Cambia a la ruta de tu textura de fondo
+        // Cargar textura de fondo
+        backgroundTexture = new Texture(Gdx.files.internal("fondoGameOver - copia.png"));
 
-        // Crea un estilo para el botón
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.up = new TextureRegionDrawable(new Texture(Gdx.files.internal("botonJugar.png"))); // Cambia a tu textura de botón
-        style.down = style.up; // Usar la misma textura para el estado presionado
+        // Inicializar botones
+        initPlayButton();
+        initMenuButton();
+        initExitButton();
+    }
 
-        // Asegúrate de que la fuente está asignada al estilo del botón
-        style.font = font; // Asignar la fuente al estilo del botón
-
-        // Crea el TextButton para reiniciar
-        playButton = new TextButton("", style);
-        playButton.setSize(300, 80);
-        playButton.setPosition(Gdx.graphics.getWidth() / 2 - playButton.getWidth() / 2, Gdx.graphics.getHeight() / 2 - playButton.getHeight() / 2); // Coloca el botón
-
-        // Añadir listener al TextButton
-        playButton.addListener(new ClickListener() {
+    private void initPlayButton() {
+        TextButton.TextButtonStyle style = createButtonStyle("botonJugar.png");
+        playButton = createButton(style, Gdx.graphics.getHeight() / 2, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Cambia a la pantalla de juego al hacer clic
-                game.setScreen(new PantallaJuego(game, 1, 3, 0, 1, 1, 5, 1));
-                dispose(); // Libera los recursos de la pantalla del Game Over
+            	dev.resetGame();
+                game.setScreen(new PantallaJuego(game, 1, 3, 1, 1, 5, 1));
+                dispose();
             }
         });
-
-        // Añadir el TextButton al escenario
         stage.addActor(playButton);
-        
-        // Crea un estilo para el botón de volver al menú
-        TextButton.TextButtonStyle menuStyle = new TextButton.TextButtonStyle();
-        menuStyle.up = new TextureRegionDrawable(new Texture(Gdx.files.internal("botonMenu.png"))); // Cargar textura del menú
-        menuStyle.down = menuStyle.up; // Usar la misma textura para el estado presionado
-        menuStyle.font = font; // Asignar la fuente al estilo del botón de menú
+    }
 
-        // Crear el TextButton para volver al menú
-        menuButton = new TextButton("", menuStyle);
-        menuButton.setSize(300, 80);
-        menuButton.setPosition(Gdx.graphics.getWidth() / 2 - menuButton.getWidth() / 2, Gdx.graphics.getHeight() / 2 - menuButton.getHeight() - 100); // Colocar el botón de menú entre los otros dos botones
-
-        // Añadir listener al TextButton de menú
-        menuButton.addListener(new ClickListener() {
+    private void initMenuButton() {
+        TextButton.TextButtonStyle style = createButtonStyle("botonMenu.png");
+        menuButton = createButton(style, Gdx.graphics.getHeight() / 2 - 100, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new PantallaMenu(game)); // Cambia a la pantalla del menú
-                dispose(); // Libera los recursos de la pantalla del Game Over
+            	dev.resetGame();
+                game.setScreen(new PantallaMenu(game));
+                dispose();
             }
         });
-
-        // Añadir el TextButton de menú al escenario
         stage.addActor(menuButton);
+    }
 
-        // Crea un estilo para el botón de salir
-        TextButton.TextButtonStyle exitStyle = new TextButton.TextButtonStyle();
-        exitStyle.up = new TextureRegionDrawable(new Texture(Gdx.files.internal("botonExit.png"))); // Cargar textura de salida
-        exitStyle.down = exitStyle.up; // Usar la misma textura para el estado presionado
-        exitStyle.font = font; // Asignar la fuente al estilo del botón de salida
-
-        // Crear el TextButton para salir
-        exitButton = new TextButton("", exitStyle);
-        exitButton.setSize(300, 80);
-        exitButton.setPosition(Gdx.graphics.getWidth() / 2 - exitButton.getWidth() / 2, Gdx.graphics.getHeight() / 2 - playButton.getHeight() - menuButton.getHeight() - 150);
-
-        // Añadir listener al TextButton de salir
-        exitButton.addListener(new ClickListener() {
+    private void initExitButton() {
+        TextButton.TextButtonStyle style = createButtonStyle("botonExit.png");
+        exitButton = createButton(style, Gdx.graphics.getHeight() / 2 - 200, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit(); // Cierra la aplicación
+                Gdx.app.exit();
             }
         });
-
-        // Añadir el TextButton de salida al escenario
         stage.addActor(exitButton);
+    }
+
+    private TextButton.TextButtonStyle createButtonStyle(String textureFile) {
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.up = new TextureRegionDrawable(new Texture(Gdx.files.internal(textureFile)));
+        style.down = style.up;
+        style.font = font;
+        return style;
+    }
+
+    private TextButton createButton(TextButton.TextButtonStyle style, float yPosition, ClickListener listener) {
+        TextButton button = new TextButton("", style);
+        button.setSize(300, 80);
+        button.setPosition(Gdx.graphics.getWidth() / 2 - button.getWidth() / 2, yPosition);
+        button.addListener(listener);
+        return button;
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
-
         camera.update();
         game.getBatch().setProjectionMatrix(camera.combined);
 
         game.getBatch().begin();
-
-        // Dibujar la textura de fondo
         game.getBatch().draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        // Dibujar la puntuación en el centro de la pantalla
-        String scoreText = "TU PUNTUACIÓN: " + score; // Texto de puntuación
+        String scoreText = "TU PUNTUACIÓN: " + GameState.getInstance().getScore();
         GlyphLayout layout = new GlyphLayout(font, scoreText);
-        float x = (Gdx.graphics.getWidth() - layout.width) / 2; // Centrar horizontalmente
-        float y = Gdx.graphics.getHeight() / 2 + 100; // Posicionar ligeramente arriba del centro
-        font.draw(game.getBatch(), scoreText, x, y); // Dibujar la puntuación
+        float x = (Gdx.graphics.getWidth() - layout.width) / 2;
+        float y = Gdx.graphics.getHeight() / 2 + 100;
+        font.draw(game.getBatch(), scoreText, x, y);
 
         game.getBatch().end();
 
-        // Dibuja el escenario
         stage.act(delta);
-        stage.draw(); // Solo dibuja el escenario, que incluye el TextButton
+        stage.draw();
     }
 
     @Override
-    public void show() {
-        // Método vacío
-    }
+    public void show() {}
 
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
         camera.update();
 
-        // Ajustar el tamaño de la fuente basado en el ancho de la ventana
-        if (width > 0) { // Verifica que el ancho sea mayor a 0
-            float scaleFactor = width / initialWidth; // Calcula el factor de escala
-            if (scaleFactor <= 0) scaleFactor = 1; // Asegura que scaleFactor no sea 0 o negativo
-            font.getData().setScale(scaleFactor); // Cambia el tamaño de la fuente
+        if (width > 0) {
+            float scaleFactor = width / initialWidth;
+            if (scaleFactor <= 0) scaleFactor = 1;
+            font.getData().setScale(scaleFactor);
         }
 
-        // Ajusta el escenario al nuevo tamaño de ventana
         stage.getViewport().update(width, height, true);
     }
 
     @Override
-    public void pause() {
-        // Método vacío
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-        // Método vacío
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-        // Método vacío
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {
-        stage.dispose(); // Libera los recursos del escenario
-        backgroundTexture.dispose(); // Libera la textura de fondo
+        stage.dispose();
+        backgroundTexture.dispose();
     }
 }

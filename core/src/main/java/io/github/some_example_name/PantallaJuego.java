@@ -23,16 +23,14 @@ public class PantallaJuego implements Screen {
     private Sound explosionSound;
     private Sound hurtSound;
     private Music gameMusic;
-    private int score;
     private int ronda;
     private int velXAsteroides;
     private int velYAsteroides;
     private int cantAsteroides;
     private static final int INCREMENTO_VELOCIDAD = 1;
     private int contadorRondas;
-    private int vidas;
-
     private Nave4 nave;
+    private GameState dev;
     private ArrayList<Ball2> balls1 = new ArrayList<>();
     private ArrayList<Bullet> balas = new ArrayList<>();
     private ArrayList<Mejora> mejoras = new ArrayList<>();
@@ -44,17 +42,15 @@ public class PantallaJuego implements Screen {
     private float tiempoTranscurrido;
     private int contadorMejoras; // Contador de mejoras generadas en la ronda actual
 
-    public PantallaJuego(SpaceNav game, int ronda, int vidas, int score, int velXAsteroides, int velYAsteroides,
+    public PantallaJuego(SpaceNav game, int ronda, int vidas, int velXAsteroides, int velYAsteroides,
                          int cantAsteroides, int contadorRondas) {
         this.game = game;
         this.ronda = ronda;
-        this.score = score;
         this.velXAsteroides = velXAsteroides;
         this.velYAsteroides = velYAsteroides;
         this.cantAsteroides = cantAsteroides;
         this.contadorRondas = contadorRondas;
-        this.vidas= vidas;
-
+        dev = GameState.getInstance();
         initialize();
     }
 
@@ -102,7 +98,7 @@ public class PantallaJuego implements Screen {
                 Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")),
                 new Texture(Gdx.files.internal("Rocket2.png")),
                 Gdx.audio.newSound(Gdx.files.internal("disparo.wav")));
-		nave.setVidas(vidas);
+        GameState.nuevasVidas(3);
 
         fondo = new Fondo("FondoEspacio.jpg", 1920, 1080, 50);
     }
@@ -136,10 +132,10 @@ public class PantallaJuego implements Screen {
     }
 
     public void dibujaEncabezado() {
-        CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
+        CharSequence str = "Vidas: " + dev.getVidas() + " Ronda: " + ronda;
         game.getFont().getData().setScale(2f);
         game.getFont().draw(batch, str, 10, 30);
-        game.getFont().draw(batch, "Score:" + this.score, Gdx.graphics.getWidth() - 150, 30);
+        game.getFont().draw(batch, "Score:" + GameState.getInstance().getScore(), Gdx.graphics.getWidth() - 150, 30); // Usa el score de GameState
         game.getFont().draw(batch, "HighScore:" + game.getHighScore(), Gdx.graphics.getWidth() / 2 - 100, 30);
     }
 
@@ -204,7 +200,7 @@ public class PantallaJuego implements Screen {
                     explosionSound.play(0.5f);
                     balls1.remove(j);
                     j--;
-                    score += 10;
+                    GameState.getInstance().addScore(10); // Usa el método addScore de GameState para agregar puntos
                     break;
                 }
             }
@@ -267,7 +263,7 @@ public class PantallaJuego implements Screen {
                             planeta.activar(nave); // Aplica el efecto de mejora del planeta
                             mejorasActivas.add(mejora);
                             mejoras.remove(j);
-                            score += 50; // Aumenta el puntaje por destruir el planeta
+                            GameState.getInstance().addScore(50); // Aumenta el puntaje por destruir el planeta
                             j--;
                         }
                     } else if (mejora instanceof EstrellaMejora) {
@@ -278,7 +274,7 @@ public class PantallaJuego implements Screen {
                             estrella.activar(nave); // Aplica el efecto de mejora de la estrella
                             mejorasActivas.add(mejora);
                             mejoras.remove(j);
-                            score += 100; // Aumenta el puntaje por destruir la estrella
+                            GameState.getInstance().addScore(100); // Aumenta el puntaje por destruir la estrella
                             j--;
                         }
                     }
@@ -320,11 +316,12 @@ public class PantallaJuego implements Screen {
     }
 
     private void checkGameOver() {
-        if (nave.getVidas() <= 0) {
-        	if (score > game.getHighScore())
-				game.setHighScore(score);
-            gameMusic.stop();
-            game.setScreen(new PantallaGameOver(game,score));
+        if (dev.getVidas() <= 0) {
+        	if (GameState.getInstance().getScore() > game.getHighScore()) {
+        	    game.setHighScore(GameState.getInstance().getScore());
+        	}
+        	gameMusic.stop();
+        	game.setScreen(new PantallaGameOver(game));
         }
     }
 
@@ -333,7 +330,7 @@ public class PantallaJuego implements Screen {
             gameMusic.stop();
             ronda++;
             contadorMejoras = 0;
-            game.setScreen(new PantallaJuego(game, ronda,  nave.getVidas() ,score, velXAsteroides + INCREMENTO_VELOCIDAD,
+            game.setScreen(new PantallaJuego(game, ronda,  dev.getVidas(), velXAsteroides + INCREMENTO_VELOCIDAD,
                     velYAsteroides + INCREMENTO_VELOCIDAD, cantAsteroides + 3, contadorRondas + 1));
         }
     }
