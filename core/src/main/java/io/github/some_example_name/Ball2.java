@@ -11,8 +11,12 @@ public class Ball2 implements Colisionable {
     private float y;
     private int xSpeed;
     private int ySpeed;
+    private int maxSpeed=10;
     private Sprite spr;
     private float originalSize; // Almacena el tamaño original
+    private boolean congelado; // Estado de congelación
+    private int velocidadOriginalX; // Almacena la velocidad original en X
+    private int velocidadOriginalY; // Almacena la velocidad original en Y
 
     public Ball2(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
         spr = new Sprite(tx);
@@ -25,6 +29,9 @@ public class Ball2 implements Colisionable {
         spr.setPosition(x, y);
         setXSpeed(xSpeed);
         setySpeed(ySpeed);
+        this.congelado = false; // Inicialmente no está congelado
+        this.velocidadOriginalX = xSpeed; // Guardar velocidad original en X
+        this.velocidadOriginalY = ySpeed; // Guardar velocidad original en Y
     }
 
     private void setPositionAndCheckBounds() {
@@ -36,15 +43,13 @@ public class Ball2 implements Colisionable {
     }
 
     public void update() {
-        // Actualizar la posición
-        x += getXSpeed();
-        y += getySpeed();
-        
-        // Comprobar límites y rebote
-        checkBounds();
-
-        // Actualiza la posición del sprite
-        spr.setPosition(x, y);
+    	if (!congelado) {
+            x += getXSpeed();
+            y += getySpeed();
+            checkBounds();
+            spr.setPosition(x, y);
+           
+        }
     }
 
     private void checkBounds() {
@@ -66,7 +71,7 @@ public class Ball2 implements Colisionable {
     }
 
     public Rectangle getArea() {
-    	Rectangle boundingRectangle = spr.getBoundingRectangle();
+        Rectangle boundingRectangle = spr.getBoundingRectangle();
         float padding = 10; // Ajusta este valor según lo necesites
         return new Rectangle(
             boundingRectangle.x + padding,
@@ -115,7 +120,7 @@ public class Ball2 implements Colisionable {
     }
 
     public void setXSpeed(int xSpeed) {
-        this.xSpeed = xSpeed;
+        this.xSpeed = Math.max(-maxSpeed, Math.min(maxSpeed, xSpeed));
     }
 
     public int getySpeed() {
@@ -123,16 +128,41 @@ public class Ball2 implements Colisionable {
     }
 
     public void setySpeed(int ySpeed) {
-        this.ySpeed = ySpeed;
+        this.ySpeed = Math.max(-maxSpeed, Math.min(maxSpeed, ySpeed));
     }
 
     public float getOriginalSize() {
         return originalSize; // Retornar tamaño original
     }
 
-	@Override
-	public void procesarColision(Nave4 nave) {
-		nave.herir();	
-	}
-}
+    public void congelar() {
+    	if (!congelado) {
+            velocidadOriginalX = xSpeed;
+            velocidadOriginalY = ySpeed;
+            setXSpeed(0);
+            setySpeed(0);
+            this.congelado = true;
+        }
+    }
 
+    public void descongelar() {
+    	if (congelado) {
+            // Verificamos que las velocidades originales son válidas antes de restaurarlas
+            if (velocidadOriginalX != 0 && velocidadOriginalY != 0) {
+                xSpeed = velocidadOriginalX;
+                ySpeed = velocidadOriginalY;
+            } else {
+                // Asignamos valores predeterminados si las velocidades originales no son válidas
+                xSpeed = 1;  // Valor por defecto
+                ySpeed = 1;  // Valor por defecto
+            }
+            congelado = false;
+        }
+    }
+    
+
+    @Override
+    public void procesarColision(Nave4 nave) {
+        nave.herir();    
+    }
+}

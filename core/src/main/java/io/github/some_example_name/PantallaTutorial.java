@@ -33,7 +33,7 @@ public class PantallaTutorial implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         // Cargar la imagen del tutorial
-        tutorialImage = new Texture(Gdx.files.internal("tutorial-copia.png"));
+        tutorialImage = new Texture(Gdx.files.internal("tutorial.png"));
         tutorialImage.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear); // Aplicar filtro a la textura
 
         // Crear el botón de "Atrás"

@@ -1,5 +1,6 @@
 package io.github.some_example_name;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -66,11 +67,11 @@ public abstract class Mejora implements Colisionable {
     public abstract void draw(SpriteBatch batch);
     public abstract void update(float delta);
 
-    public static Mejora generarMejoraAleatoria(float x, float y) {
+    public static Mejora generarMejoraAleatoria(float x, float y, ArrayList<Ball2> balls1) {
         Random random = new Random();
         int tipoAleatorio = random.nextInt(2);
         switch (tipoAleatorio) {
-            case 0: return new PlanetaMejora(x, y, new Texture("planeta.png"), 10);
+            case 0: return new PlanetaMejora(x, y, new Texture("planeta.png"), 10 , balls1);
             case 1: return new EstrellaMejora(x, y, new Texture("estrella.png"), 100);
         }
         return null;

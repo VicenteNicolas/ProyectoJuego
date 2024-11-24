@@ -122,7 +122,7 @@ public class PantallaJuego implements Screen {
         Random r = new Random();
         float x = r.nextInt((int) Gdx.graphics.getWidth() - 50);
         float y = Gdx.graphics.getHeight() + 50;
-        Mejora mejora = Mejora.generarMejoraAleatoria(x, y);
+        Mejora mejora = Mejora.generarMejoraAleatoria(x, y, balls1);
         if (mejora != null) {
             mejoras.add(mejora);
             contadorMejoras++; 
