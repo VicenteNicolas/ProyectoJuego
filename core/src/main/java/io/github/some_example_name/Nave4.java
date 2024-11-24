@@ -17,6 +17,8 @@ public class Nave4 {
     private Disparo disparo;
 
     private MovimientoNave movimientoNave;
+    private EstrategiaMovimiento estrategiaMovimiento;
+    private boolean mejoraActiva; // Indica si hay una mejora activa
 
     public Nave4(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
         this.sonidoHerido = soundChoque;
@@ -26,6 +28,7 @@ public class Nave4 {
         this.disparo = new Disparo(spr, soundBala, txBala);
 
         this.movimientoNave = new MovimientoNave(spr, 1); // Velocidad inicial
+        this.estrategiaMovimiento = new MovimientoRapido();
     }
 
     public void reducirCooldownDisparo() {
@@ -38,7 +41,8 @@ public class Nave4 {
 
     public void draw(SpriteBatch batch, PantallaJuego juego) {
         if (!herido) {
-            movimientoNave.actualizar();
+        	estrategiaMovimiento.mover(this); 
+        	movimientoNave.actualizar();
             spr.draw(batch);
         } else {
             movimientoNave.aplicarMovimientoHerido();
@@ -79,10 +83,31 @@ public class Nave4 {
     public boolean estaHerido() {
         return herido;
     }
+    
+    public void presionarTeclaDisparo(boolean presionada) {
+
+    	
+    	if (mejoraActiva) {
+    		
+    		// Si hay una mejora activa, no se penaliza con el movimiento al spamear balas
+    		estrategiaMovimiento = new MovimientoRapido();
+            return;
+        }
+
+        if (presionada) {
+            // Cambiar a movimiento lento al mantener presionada la tecla de disparo
+            estrategiaMovimiento = new MovimientoLento(); // Cambia la estrategia a movimiento lento
+            disparo.setCooldown(0.4f); // Cambia el cooldown para disparar más lento
+        } else {
+            // Cambiar a movimiento rápido al soltar la tecla de disparo
+            estrategiaMovimiento = new MovimientoRapido(); // Cambia la estrategia a movimiento rápido
+            disparo.setCooldown(0.5f); // Cambia el cooldown para disparar más rápido
+        }
+    }
 
 
     public void incrementarVelocidad() {
-        movimientoNave.incrementarVelocidad(2);
+        movimientoNave.incrementarVelocidad(5);
     }
 
     public void revertirVelocidad() {
@@ -91,5 +116,16 @@ public class Nave4 {
 
     public float getVelocidad() {
         return movimientoNave.getVelocidad();
+    }
+    
+    public MovimientoNave getMovimientoNave() {
+        return movimientoNave;
+    }
+    
+    public void setMejoraActiva(boolean activa) {
+        this.mejoraActiva = activa;
+    }
+    public boolean isMejoraActiva() {
+        return mejoraActiva;
     }
 }

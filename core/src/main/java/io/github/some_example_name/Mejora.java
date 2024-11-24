@@ -20,18 +20,22 @@ public abstract class Mejora implements Colisionable {
         this.y = y;
     }
 
-    public void activarMejora() {
-        this.tiempoActivacion = 0;
-        this.activa = true;
+    // Método Template
+    public final void templateMethod(Nave4 nave) {
+        this.activa = true; // Marcar la mejora como activa
+        tiempoActivacion = 0; // Reiniciar el tiempo de activación
+        aplicarEfecto(nave);
     }
+
+   
 
     public void desactivar() {
         this.activa = false;
     }
 
-    public boolean estaActiva(float delta) {
+    public boolean actualizarEstado(float delta) {
         if (activa) {
-            tiempoActivacion += delta; // Aumentar el tiempo activación
+            tiempoActivacion += delta; // Aumentar el tiempo de activación
             if (tiempoActivacion >= duracion) {
                 desactivar();
                 return false; // La mejora ya no está activa
@@ -41,14 +45,13 @@ public abstract class Mejora implements Colisionable {
     }
 
     public void activar(Nave4 nave) {
-        if (!estaActiva(0)) { // Llamar con 0 para verificar estado
-            activarMejora();
-            aplicarEfecto(nave);
-        }
+    	nave.setMejoraActiva(true); 
+    	templateMethod(nave);
     }
 
     public void verificarDesactivar(Nave4 nave, float delta) {
-        if (!estaActiva(delta)) {
+        if (!actualizarEstado(delta)) {
+        	nave.setMejoraActiva(false);
             removerEfecto(nave);
         }
     }
@@ -57,38 +60,11 @@ public abstract class Mejora implements Colisionable {
         return tipo;
     }
 
-    public void aplicarEfecto(Nave4 nave) {
-        switch (tipo) {
-            case "velocidad":
-                nave.incrementarVelocidad();
-                break;
-            case "escudo":
-
-                break;
-            case "disparo y vida":    	
-            	nave.reducirCooldownDisparo();
-            	GameState.nuevasVidas(5);
-
-                break;
-        }
-    }
-
-    public void removerEfecto(Nave4 nave) {
-        switch (tipo) {
-            case "velocidad":
-                nave.revertirVelocidad();
-                break;
-            case "escudo":
-
-                break;
-            case "disparo":
-            	
-            	nave.getDisparo().setCooldown(0.5f); // Restaurar cooldown original
-
-
-                break;
-        }
-    }
+    // Métodos abstractos que las subclases deben implementar
+    protected abstract void aplicarEfecto(Nave4 nave);
+    protected abstract void removerEfecto(Nave4 nave);
+    public abstract void draw(SpriteBatch batch);
+    public abstract void update(float delta);
 
     public static Mejora generarMejoraAleatoria(float x, float y) {
         Random random = new Random();
@@ -96,11 +72,8 @@ public abstract class Mejora implements Colisionable {
         switch (tipoAleatorio) {
             case 0: return new PlanetaMejora(x, y, new Texture("planeta.png"), 10);
             case 1: return new EstrellaMejora(x, y, new Texture("estrella.png"), 100);
-
         }
         return null;
     }
 
-    public abstract void draw(SpriteBatch batch);
-    public abstract void update(float delta);
 }

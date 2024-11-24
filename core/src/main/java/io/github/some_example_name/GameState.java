@@ -63,16 +63,17 @@ public class GameState {
         }
     }
 
-    public int getRound() {
+    public int getRonda() {
         return ronda;
     }
 
-    public void nextRound() {
+    public void sigRonda() {
         this.ronda++;
     }
 
     public void resetGame() {
         this.score = 0;
+        this.vidas = 3;
         this.ronda = 1;
     }
 }

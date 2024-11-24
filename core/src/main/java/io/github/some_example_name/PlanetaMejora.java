@@ -57,5 +57,19 @@ public class PlanetaMejora extends Mejora {
 		GameState.nuevasVidas(0);
 		
 	}
+	
+	@Override
+    protected void aplicarEfecto(Nave4 nave) {
+    	  	
+		 nave.incrementarVelocidad();
+
+    }
+
+    @Override
+    protected void removerEfecto(Nave4 nave) {
+    	nave.revertirVelocidad();
+    }
+	
+	
 
 }

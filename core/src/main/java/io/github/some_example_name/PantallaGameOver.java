@@ -59,7 +59,7 @@ public class PantallaGameOver implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
             	dev.resetGame();
-                game.setScreen(new PantallaJuego(game, 1, 3, 1, 1, 5, 1));
+                game.setScreen(new PantallaJuego(game, 1, 1, 5, 1));
                 dispose();
             }
         });

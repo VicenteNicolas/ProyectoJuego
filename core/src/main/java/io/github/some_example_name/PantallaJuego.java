@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -23,14 +24,12 @@ public class PantallaJuego implements Screen {
     private Sound explosionSound;
     private Sound hurtSound;
     private Music gameMusic;
-    private int ronda;
     private int velXAsteroides;
     private int velYAsteroides;
     private int cantAsteroides;
     private static final int INCREMENTO_VELOCIDAD = 1;
     private int contadorRondas;
     private Nave4 nave;
-    private GameState dev;
     private ArrayList<Ball2> balls1 = new ArrayList<>();
     private ArrayList<Bullet> balas = new ArrayList<>();
     private ArrayList<Mejora> mejoras = new ArrayList<>();
@@ -41,16 +40,15 @@ public class PantallaJuego implements Screen {
     private float tiempoEspera;  // Tiempo hasta que aparezca ls proxima mejora
     private float tiempoTranscurrido;
     private int contadorMejoras; // Contador de mejoras generadas en la ronda actual
+    private GameState dev = GameState.getInstance();
 
-    public PantallaJuego(SpaceNav game, int ronda, int vidas, int velXAsteroides, int velYAsteroides,
+    public PantallaJuego(SpaceNav game, int velXAsteroides, int velYAsteroides,
                          int cantAsteroides, int contadorRondas) {
         this.game = game;
-        this.ronda = ronda;
         this.velXAsteroides = velXAsteroides;
         this.velYAsteroides = velYAsteroides;
         this.cantAsteroides = cantAsteroides;
         this.contadorRondas = contadorRondas;
-        dev = GameState.getInstance();
         initialize();
     }
 
@@ -98,7 +96,7 @@ public class PantallaJuego implements Screen {
                 Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")),
                 new Texture(Gdx.files.internal("Rocket2.png")),
                 Gdx.audio.newSound(Gdx.files.internal("disparo.wav")));
-        GameState.nuevasVidas(3);
+        dev.getVidas();
 
         fondo = new Fondo("FondoEspacio.jpg", 1920, 1080, 50);
     }
@@ -132,7 +130,7 @@ public class PantallaJuego implements Screen {
     }
 
     public void dibujaEncabezado() {
-        CharSequence str = "Vidas: " + dev.getVidas() + " Ronda: " + ronda;
+        CharSequence str = "Vidas: " + dev.getVidas() + " Ronda: " + dev.getRonda();
         game.getFont().getData().setScale(2f);
         game.getFont().draw(batch, str, 10, 30);
         game.getFont().draw(batch, "Score:" + GameState.getInstance().getScore(), Gdx.graphics.getWidth() - 150, 30); // Usa el score de GameState
@@ -159,6 +157,7 @@ public class PantallaJuego implements Screen {
         }
 
         updateMejoras(delta);
+        updateDisparo(delta);
         dibujaEncabezado();
         handleCollisions();
         drawEntities();
@@ -177,6 +176,15 @@ public class PantallaJuego implements Screen {
         
         for (Mejora mejora : mejorasActivas) {
             mejora.verificarDesactivar(nave, delta);
+        }
+    }
+    
+    private void updateDisparo(float delta) {
+    	// Verifica si la tecla de disparo está presionada
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            nave.presionarTeclaDisparo(true); // Llama al método con true
+        } else {
+            nave.presionarTeclaDisparo(false); // Llama al método con false
         }
     }
 
@@ -242,7 +250,6 @@ public class PantallaJuego implements Screen {
         }
     }
     
-
     private void checkBulletMejoraCollisions() {
         for (int i = 0; i < balas.size(); i++) {
             Bullet b = balas.get(i);
@@ -291,7 +298,6 @@ public class PantallaJuego implements Screen {
         
     }
 
-    
     private void checkNaveAsteroidCollisions() {
         for (int i = 0; i < balls1.size(); i++) {
             Ball2 ball = balls1.get(i);
@@ -328,9 +334,9 @@ public class PantallaJuego implements Screen {
     private void checkLevelCompleted() {
         if (balls1.isEmpty()) {
             gameMusic.stop();
-            ronda++;
+            dev.sigRonda();
             contadorMejoras = 0;
-            game.setScreen(new PantallaJuego(game, ronda,  dev.getVidas(), velXAsteroides + INCREMENTO_VELOCIDAD,
+            game.setScreen(new PantallaJuego(game, velXAsteroides + INCREMENTO_VELOCIDAD,
                     velYAsteroides + INCREMENTO_VELOCIDAD, cantAsteroides + 3, contadorRondas + 1));
         }
     }

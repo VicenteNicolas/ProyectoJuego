@@ -54,6 +54,10 @@ public class MovimientoNave {
             spr.setY(y + yVel * velocidadActual);
         }
     }
+    
+    public void setVelocidad(float nuevaVelocidad) {
+        this.velocidadActual = nuevaVelocidad;
+    }
 
     public void incrementarVelocidad(float incremento) {
         velocidadActual += incremento;

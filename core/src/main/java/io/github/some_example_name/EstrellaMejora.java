@@ -6,26 +6,26 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-public class EstrellaMejora extends Mejora  {
+public class EstrellaMejora extends Mejora {
     private Texture texture;
     private float ancho; 
     private float alto;
     
     private int contadorImpactos = 0;
-    private int maxImpactos = 0;
+    private int maxImpactos;
     
     public EstrellaMejora(float x, float y, Texture texture, int duracion) {
         super("disparo y vida", duracion, x, y); 
         this.texture = texture;
         this.ancho = texture.getWidth();
         this.alto = texture.getHeight();
+        Random random = new Random();
+        this.maxImpactos = random.nextInt(10); 
     }
     
- // Verifica si la mejora ha sido destruida
+    // Verifica si la mejora ha sido destruida
     public boolean estaDestruido() {
-    	Random random = new Random();
-        maxImpactos = random.nextInt(100);
-        return contadorImpactos >= maxImpactos;
+    	return contadorImpactos >= maxImpactos;
     }
 
     // Recibir impacto y verificar la cantidad de impactos
@@ -40,18 +40,28 @@ public class EstrellaMejora extends Mejora  {
 
     @Override
     public void draw(SpriteBatch batch) {
-    	batch.draw(texture, x, y, ancho/10  , alto/10 );
+        batch.draw(texture, x, y, ancho / 10, alto / 10);
     }
 
     @Override
     public Rectangle getArea() {
-        return new Rectangle(x, y, ancho/10  , alto/10);
+        return new Rectangle(x, y, ancho / 10, alto / 10);
     }
 
-	@Override
-	public void procesarColision(Nave4 nave) {
-		GameState.nuevasVidas(0);
-	
-	}
-}
+    @Override
+    public void procesarColision(Nave4 nave) {
+        GameState.nuevasVidas(0);
+    }
 
+    @Override
+    protected void aplicarEfecto(Nave4 nave) {	 
+    	
+        	nave.reducirCooldownDisparo();
+        	GameState.nuevasVidas(5);
+    }
+
+    @Override
+    protected void removerEfecto(Nave4 nave) {
+    	nave.getDisparo().setCooldown(0.5f); // Restaurar cooldown original
+    }
+}
