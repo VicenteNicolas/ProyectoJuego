@@ -26,10 +26,12 @@ public class PantallaGameOver implements Screen {
     private TextButton menuButton;
     private Texture backgroundTexture;
     private GameState dev;
+    private boolean isAdvanced;
 
-    public PantallaGameOver(SpaceNav game) {
+    public PantallaGameOver(SpaceNav game, boolean isAdvanced) {
         this.game = game;
-        dev = GameState.getInstance();
+        this.isAdvanced = isAdvanced;
+        dev = GameState.getInstance();     
         init();
     }
 
@@ -59,7 +61,7 @@ public class PantallaGameOver implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
             	dev.resetGame();
-                game.setScreen(new PantallaJuego(game, 1, 1, 5, 1));
+                game.setScreen(new PantallaJuego(game, 1, 1, 5, 1, isAdvanced));
                 dispose();
             }
         });

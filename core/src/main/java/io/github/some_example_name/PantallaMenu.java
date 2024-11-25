@@ -27,6 +27,7 @@ public class PantallaMenu implements Screen {
     private Viewport viewport;
     private Texture backgroundTexture; // Nueva variable para la textura de fondo
     private SpriteBatch batch; // Para dibujar la textura de fondo
+    private boolean isAdvanced = false;
 
     public PantallaMenu(SpaceNav game) {
         camera = new OrthographicCamera();
@@ -65,7 +66,7 @@ public class PantallaMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // Cambia a la pantalla de juego al hacer clic
-                game.setScreen(new PantallaJuego(game, 1, 1, 5, 1));
+                game.setScreen(new PantallaJuego(game, 1, 1, 5, 1, isAdvanced));
                 dispose(); // Libera los recursos de la pantalla del menú
             }
         });
@@ -125,6 +126,39 @@ public class PantallaMenu implements Screen {
 
         // Añadir el botón de salida al escenario
         stage.addActor(exitButton);
+        
+        
+     // Crear el botón para activar/desactivar el modo avanzado
+        Texture facilTexture = new Texture(Gdx.files.internal("facil.png"));
+        Texture dificilTexture = new Texture(Gdx.files.internal("dificil.png"));
+        TextButton.TextButtonStyle adStyle = new TextButton.TextButtonStyle();
+        adStyle.font = font; // Establece la fuente del botón
+
+        if (isAdvanced) {
+        	adStyle.up = new TextureRegionDrawable(dificilTexture); // Textura para el modo difícil
+        } else {
+        	adStyle.up = new TextureRegionDrawable(facilTexture); // Textura para el modo fácil
+        }
+
+        TextButton modoButton = new TextButton("", adStyle);
+        modoButton.setSize(300, 80);
+        modoButton.setPosition(viewport.getWorldWidth() / 2 - modoButton.getWidth() / 2, viewport.getWorldHeight() / 2 - modoButton.getHeight() - 350);
+
+     // Listener para cambiar la textura
+        modoButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                isAdvanced = !isAdvanced; // Cambia el estado de isAdvanced
+                if (isAdvanced) {
+                    modoButton.getStyle().up = new TextureRegionDrawable(dificilTexture);
+                } else {
+                    modoButton.getStyle().up = new TextureRegionDrawable(facilTexture);
+                }
+            }
+        });
+
+        stage.addActor(modoButton);
+        Gdx.input.setInputProcessor(stage);
 
         // Crear un Label para el título
         Label.LabelStyle labelStyle = new Label.LabelStyle();

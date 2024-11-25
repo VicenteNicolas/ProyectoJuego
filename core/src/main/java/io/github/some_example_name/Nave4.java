@@ -20,12 +20,12 @@ public class Nave4 {
     private EstrategiaMovimiento estrategiaMovimiento;
     private boolean mejoraActiva; // Indica si hay una mejora activa
 
-    public Nave4(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
+    public Nave4(int x, int y, Texture tx, Sound soundChoque, GameObjectFactory factory, Sound soundBala) {
         this.sonidoHerido = soundChoque;
         this.spr = new Sprite(tx);
         spr.setPosition(x, y);
         spr.setBounds(x, y, 60, 60);
-        this.disparo = new Disparo(spr, soundBala, txBala);
+        this.disparo = new Disparo(spr, soundBala, factory);
 
         this.movimientoNave = new MovimientoNave(spr, 1); // Velocidad inicial
         this.estrategiaMovimiento = new MovimientoRapido();

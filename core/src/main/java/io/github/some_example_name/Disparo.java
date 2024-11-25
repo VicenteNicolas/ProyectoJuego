@@ -2,7 +2,6 @@ package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.audio.Sound;
 
@@ -11,12 +10,12 @@ public class Disparo {
     private Sound soundBala;
     private float cooldown = 0; // Cooldown actual
     private float cooldownBase = 0.5f; // Cooldown base
-    private Texture txBala;
+    private GameObjectFactory factory;
 
-    public Disparo(Sprite spr, Sound soundBala, Texture txBala) {
+    public Disparo(Sprite spr, Sound soundBala, GameObjectFactory factory) {
         this.spr = spr;
         this.soundBala = soundBala;
-        this.txBala = txBala;
+        this.factory = factory; // Inicializa la fábrica
     }
 
     public void intentarDisparar(PantallaJuego juego) {
@@ -24,7 +23,7 @@ public class Disparo {
         
         // Usa cooldownBase como el tiempo de espera entre disparos
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && cooldown <= 0) {
-            Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0, 4, txBala);
+        	Bullet bala = factory.createBullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0, 4);
             juego.agregarBala(bala);
             soundBala.play();
             cooldown = cooldownBase; // Aquí se utiliza el cooldownBase

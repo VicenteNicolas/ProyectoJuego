@@ -160,6 +160,10 @@ public class Ball2 implements Colisionable {
         }
     }
     
+    public boolean isCongelado() {
+    	return congelado;
+    }
+    
 
     @Override
     public void procesarColision(Nave4 nave) {

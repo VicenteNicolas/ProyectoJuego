@@ -41,14 +41,30 @@ public class PantallaJuego implements Screen {
     private float tiempoTranscurrido;
     private int contadorMejoras; // Contador de mejoras generadas en la ronda actual
     private GameState dev = GameState.getInstance();
+    private boolean isAdvanced;
+    
+    private GameObjectFactory objectFactory;
 
     public PantallaJuego(SpaceNav game, int velXAsteroides, int velYAsteroides,
-                         int cantAsteroides, int contadorRondas) {
+                         int cantAsteroides, int contadorRondas,boolean isAdvanced) {
         this.game = game;
+        this.isAdvanced = isAdvanced;
         this.velXAsteroides = velXAsteroides;
         this.velYAsteroides = velYAsteroides;
         this.cantAsteroides = cantAsteroides;
         this.contadorRondas = contadorRondas;
+        
+     // Inicializa la fábrica según el tipo
+        Texture asteroidTexture = new Texture(Gdx.files.internal("aGreyMedium4.png"));
+        Texture bulletTexture = new Texture(Gdx.files.internal("Rocket2.png"));
+        // Carga otras texturas necesarias
+        ArrayList<Ball2> balls1 = new ArrayList<>(); // Puedes pasar la lista de Ball2 a la fábrica
+
+        if (isAdvanced) {
+            objectFactory = new AdvancedObjectFactory(asteroidTexture, bulletTexture, balls1);
+        } else {
+            objectFactory = new BasicObjectFactory(asteroidTexture, bulletTexture, balls1);
+        }
         initialize();
     }
 
@@ -94,7 +110,7 @@ public class PantallaJuego implements Screen {
         nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
                 new Texture(Gdx.files.internal("MainShip3.png")),
                 Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")),
-                new Texture(Gdx.files.internal("Rocket2.png")),
+                objectFactory, // Pasa la fábrica aquí
                 Gdx.audio.newSound(Gdx.files.internal("disparo.wav")));
         dev.getVidas();
 
@@ -102,14 +118,16 @@ public class PantallaJuego implements Screen {
     }
 
     private void createAsteroids() {
-        Random r = new Random();
+    	Random r = new Random();
         for (int i = 0; i < cantAsteroides; i++) {
-            Ball2 bb = new Ball2(r.nextInt((int) Gdx.graphics.getWidth()),
-                    50 + r.nextInt((int) Gdx.graphics.getHeight() - 50),
-                    70 + r.nextInt(10),
-                    velXAsteroides + r.nextInt(2),
-                    velYAsteroides + r.nextInt(2),
-                    new Texture(Gdx.files.internal("aGreyMedium4.png")));
+            int x = r.nextInt((int) Gdx.graphics.getWidth());
+            int y = 50 + r.nextInt((int) Gdx.graphics.getHeight() - 50);
+            int radius = 70 + r.nextInt(10);
+            int velX = velXAsteroides + r.nextInt(2);
+            int velY = velYAsteroides + r.nextInt(2);
+            
+            // Usa la fábrica para crear el asteroide
+            Ball2 bb = objectFactory.createAsteroid(x, y, radius, velX, velY);
             balls1.add(bb);
         }
     }
@@ -122,7 +140,7 @@ public class PantallaJuego implements Screen {
         Random r = new Random();
         float x = r.nextInt((int) Gdx.graphics.getWidth() - 50);
         float y = Gdx.graphics.getHeight() + 50;
-        Mejora mejora = Mejora.generarMejoraAleatoria(x, y, balls1);
+        Mejora mejora = objectFactory.createMejora(x, y, balls1);
         if (mejora != null) {
             mejoras.add(mejora);
             contadorMejoras++; 
@@ -327,7 +345,7 @@ public class PantallaJuego implements Screen {
         	    game.setHighScore(GameState.getInstance().getScore());
         	}
         	gameMusic.stop();
-        	game.setScreen(new PantallaGameOver(game));
+        	game.setScreen(new PantallaGameOver(game, isAdvanced));
         }
     }
 
@@ -337,7 +355,7 @@ public class PantallaJuego implements Screen {
             dev.sigRonda();
             contadorMejoras = 0;
             game.setScreen(new PantallaJuego(game, velXAsteroides + INCREMENTO_VELOCIDAD,
-                    velYAsteroides + INCREMENTO_VELOCIDAD, cantAsteroides + 3, contadorRondas + 1));
+                    velYAsteroides + INCREMENTO_VELOCIDAD, cantAsteroides + 3, contadorRondas + 1, isAdvanced));
         }
     }
 
